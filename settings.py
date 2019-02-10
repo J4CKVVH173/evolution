@@ -1,0 +1,7 @@
+ROW = 16
+COL = 28
+
+CELL_X = 45
+CELL_Y = CELL_X
+
+CELL_COLOR = 'white'
