@@ -23,7 +23,7 @@ class Cell:
         self.steps = 10  # number of available cell moves
         self.dna_pointer = 0
         self.MAP = grid.copy()
-        self.dna = self.dna_generation()
+        self.dna = self._dna_generation()
         self.health_text_id = health_id
 
     def get_position(self) -> list:
@@ -45,13 +45,13 @@ class Cell:
         elif current_action == 1:
             # cell takes a step in given direction
             if self.face == 3 and not self.check_slot(self.x + 1, self.y, items):  # step to right
-                self.step(self.x + 1, self.y, canvas, items)
+                self._step(self.x + 1, self.y, canvas, items)
             elif self.face == 4 and not self.check_slot(self.x, self.y + 1, items):  # step to down
-                self.step(self.x, self.y + 1, canvas, items)
+                self._step(self.x, self.y + 1, canvas, items)
             elif self.face == 5 and not self.check_slot(self.x - 1, self.y, items):  # step to left
-                self.step(self.x - 1, self.y, canvas, items)
+                self._step(self.x - 1, self.y, canvas, items)
             elif self.face == 2 and not self.check_slot(self.x, self.y - 1, items):  # step to up
-                self.step(self.x, self.y - 1, canvas, items)
+                self._step(self.x, self.y - 1, canvas, items)
             self.steps = 0
             if self.dna_pointer < len(self.dna) - 1:
                 self.dna_pointer += 1
@@ -83,7 +83,7 @@ class Cell:
         if slot == 'busy':
             return bool(items.get(self.MAP[y][x]))
 
-    def step(self, next_x: int, next_y: int, canvas: Canvas, items: dict) -> None:
+    def _step(self, next_x: int, next_y: int, canvas: Canvas, items: dict) -> None:
         """
         method moves the cell to a new slot
         :param next_x: x coordinate the new slot
@@ -109,6 +109,6 @@ class Cell:
         items[self.id] = 'cell'  # add to hash new cell position
 
     @staticmethod
-    def dna_generation():
+    def _dna_generation():
         return [random.randint(1, 5) for _ in range(64)]
 
