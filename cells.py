@@ -1,4 +1,5 @@
 import random
+import settings
 
 from tkinter import Canvas
 from tools import Accident
@@ -6,7 +7,7 @@ from tools import Accident
 
 class Cell:
 
-    def __init__(self, sell_id: int, x: int, y: int, grid: list) -> None:
+    def __init__(self, sell_id: int, x: int, y: int, grid: list, health_id: int) -> None:
         """
         init object
         :param sell_id: id sell on the map
@@ -23,6 +24,7 @@ class Cell:
         self.dna_pointer = 0
         self.MAP = grid.copy()
         self.dna = self.dna_generation()
+        self.health_text_id = health_id
 
     def get_position(self) -> list:
         position = [self.id, self.x, self.y]
@@ -31,7 +33,7 @@ class Cell:
     def can_move(self) -> bool:
         return bool(self.steps)
 
-    def action(self, canvas: Canvas) -> None:
+    def action(self, canvas: Canvas, items: dict) -> None:
         current_action: int = self.dna[self.dna_pointer]
         if 2 <= current_action <= 5:
             self.face = current_action
@@ -41,26 +43,15 @@ class Cell:
             else:
                 self.dna_pointer = 0
         elif current_action == 1:
-            if self.face == 3 and bool(self.MAP[self.y][self.x + 1]):  # step to right
-                canvas.itemconfig(self.id, fill='white')
-                self.x += 1
-                self.id = self.MAP[self.y][self.x]
-                canvas.itemconfig(self.id, fill='green')
-            elif self.face == 4 and bool(self.MAP[self.y + 1][self.x]):  # step to down
-                canvas.itemconfig(self.id, fill='white')
-                self.y += 1
-                self.id = self.MAP[self.y][self.x]
-                canvas.itemconfig(self.id, fill='green')
-            elif self.face == 5 and bool(self.MAP[self.y][self.x - 1]):  # step to left
-                canvas.itemconfig(self.id, fill='white')
-                self.x -= 1
-                self.id = self.MAP[self.y][self.x]
-                canvas.itemconfig(self.id, fill='green')
-            elif self.face == 2 and bool(self.MAP[self.y - 1][self.x]):  # step to up
-                canvas.itemconfig(self.id, fill='white')
-                self.y -= 1
-                self.id = self.MAP[self.y][self.x]
-                canvas.itemconfig(self.id, fill='green')
+            # cell takes a step in given direction
+            if self.face == 3 and not self.check_slot(self.x + 1, self.y, items):  # step to right
+                self.step(self.x + 1, self.y, canvas, items)
+            elif self.face == 4 and not self.check_slot(self.x, self.y + 1, items):  # step to down
+                self.step(self.x, self.y + 1, canvas, items)
+            elif self.face == 5 and not self.check_slot(self.x - 1, self.y, items):  # step to left
+                self.step(self.x - 1, self.y, canvas, items)
+            elif self.face == 2 and not self.check_slot(self.x, self.y - 1, items):  # step to up
+                self.step(self.x, self.y - 1, canvas, items)
             self.steps = 0
             if self.dna_pointer < len(self.dna) - 1:
                 self.dna_pointer += 1
@@ -73,6 +64,51 @@ class Cell:
         # sets the steps in the initial value
         self.steps = 10
 
+    def get_coordinates(self) -> tuple:
+        return self.x, self.y
+
+    def get_id(self) -> int:
+        return self.id
+
+    def check_slot(self, x: int, y: int, items: dict, slot='busy') -> bool:
+        """
+        Check the cell with specified coordinate
+        :param x: cell x coordinate
+        :param y: cell y coordinate
+        :param items: list of all non-empty cells
+        :param slot: 'busy' - cell is busy with something
+        :return: bool
+        """
+
+        if slot == 'busy':
+            return bool(items.get(self.MAP[y][x]))
+
+    def step(self, next_x: int, next_y: int, canvas: Canvas, items: dict) -> None:
+        """
+        method moves the cell to a new slot
+        :param next_x: x coordinate the new slot
+        :param next_y: y coordinate the new slot
+        :param canvas: object canvas
+        :param items: hash map of all objects on the map
+        :return: None
+        """
+
+        del items[self.id]  # delete in hash old cell position
+
+        canvas.itemconfig(self.id, fill='white')
+        self.y = next_y
+        self.x = next_x
+        self.id = self.MAP[self.y][self.x]
+        canvas.itemconfig(self.id, fill='green')
+        # ToDo made a method for tracking health
+        canvas.coords(self.health_text_id,
+                      settings.CELL_CENTER + settings.CELL_X * self.x,
+                      settings.CELL_CENTER + settings.CELL_Y * self.y)
+        canvas.itemconfig(self.health_text_id, text=str(self.health))
+
+        items[self.id] = 'cell'  # add to hash new cell position
+
     @staticmethod
     def dna_generation():
         return [random.randint(1, 5) for _ in range(64)]
+

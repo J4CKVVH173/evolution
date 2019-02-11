@@ -5,3 +5,11 @@ class Accident(Exception):
 
     def msg_print(self):
         return self.msg
+
+
+def set_position(cells: list) -> dict:
+    positions = dict()
+    for cell in cells:
+        positions[cell.get_id()] = 'cell'
+
+    return positions

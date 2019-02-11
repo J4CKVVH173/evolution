@@ -1,6 +1,7 @@
 import settings
 import cells
 import time
+import tools
 
 from tkinter import *
 
@@ -37,20 +38,24 @@ for idx, row in enumerate(grid):
     y1 += settings.CELL_Y
     y2 += settings.CELL_Y
 
+id2 = canvas.create_text(settings.CELL_CENTER, settings.CELL_CENTER, text='20')
+cell_one = cells.Cell(grid[2][2], 2, 2, grid, id2)
+canvas.move(id2, settings.CELL_X * 2, settings.CELL_Y * 2)
 
-cell_one = cells.Cell(grid[2][2], 2, 2, grid)
-cell_two = cells.Cell(grid[3][3], 3, 3, grid)
-cell_three = cells.Cell(grid[4][2], 4, 2, grid)
+cells = [cell_one]
 
-cells = [cell_one, cell_two, cell_three]
+
+position_on_map = tools.set_position(cells)
+position_on_map[0] = 'wall'
 
 while True:
 
+    canvas.move(id, settings.CELL_X* 2, 0)
     for cell in cells:
         while cell.can_move():
-            cell.action(canvas)
+            cell.action(canvas, position_on_map)
         cell.reset_steps()
     canvas.update()
-    time.sleep(0.3)
+    time.sleep(0.9)
 
 root.mainloop()

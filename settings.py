@@ -1,7 +1,8 @@
-ROW = 16
-COL = 28
+ROW = 20
+COL = 36
 
-CELL_X = 45
+CELL_X = 35
 CELL_Y = CELL_X
+CELL_CENTER = CELL_X / 2
 
 CELL_COLOR = 'white'
