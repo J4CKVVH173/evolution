@@ -54,8 +54,11 @@ while True:
     for cell in cells:
         while cell.can_move():
             cell.action(canvas, position_on_map)
+            if not cell.has_health():
+                cell.kill(canvas)
+                cells.remove(cell)
         cell.reset_steps()
     canvas.update()
-    time.sleep(0.9)
+    time.sleep(0.2)
 
 root.mainloop()

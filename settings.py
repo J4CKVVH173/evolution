@@ -1,7 +1,7 @@
-ROW = 20
-COL = 36
+ROW = 28
+COL = 50
 
-CELL_X = 35
+CELL_X = 25
 CELL_Y = CELL_X
 CELL_CENTER = CELL_X / 2
 

@@ -53,6 +53,7 @@ class Cell:
             elif self.face == 2 and not self.check_slot(self.x, self.y - 1, items):  # step to up
                 self._step(self.x, self.y - 1, canvas, items)
             self.steps = 0
+            self._update_health(canvas)
             if self.dna_pointer < len(self.dna) - 1:
                 self.dna_pointer += 1
             else:
@@ -100,13 +101,28 @@ class Cell:
         self.x = next_x
         self.id = self.MAP[self.y][self.x]
         canvas.itemconfig(self.id, fill='green')
-        # ToDo made a method for tracking health
+
+        items[self.id] = 'cell'  # add to hash new cell position
+
+    def _update_health(self, canvas: Canvas) -> None:
+        """
+        Updating health counter and text
+        :param canvas: object Canvas
+        :return: None
+        """
         canvas.coords(self.health_text_id,
                       settings.CELL_CENTER + settings.CELL_X * self.x,
                       settings.CELL_CENTER + settings.CELL_Y * self.y)
+        self.health -= 1
         canvas.itemconfig(self.health_text_id, text=str(self.health))
 
-        items[self.id] = 'cell'  # add to hash new cell position
+    def has_health(self):
+        return self.health > 0
+
+    def kill(self, canvas):
+        canvas.itemconfig(self.id, fill='white')
+        canvas.delete(self.health_text_id)
+
 
     @staticmethod
     def _dna_generation():
