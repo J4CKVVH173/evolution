@@ -5,4 +5,8 @@ CELL_X = 25
 CELL_Y = CELL_X
 CELL_CENTER = CELL_X / 2
 
-CELL_COLOR = 'white'
+CELL_COLOR = 'blue'
+EMPTY = 'white'
+WALL = 'grey'
+FOOD = 'green'
+
